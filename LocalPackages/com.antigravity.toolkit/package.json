@@ -1,0 +1,19 @@
+{
+    "name": "com.antigravity.toolkit",
+    "version": "2.3.0",
+    "displayName": "Antigravity Toolkit",
+    "description": "A suite of high-performance tools for Unity development.",
+    "unity": "2021.3",
+    "unityRelease": "0f1",
+    "keywords": [
+        "toolkit",
+        "console",
+        "debug",
+        "tools"
+    ],
+    "author": {
+        "name": "Antigravity",
+        "email": "dev@antigravity.com",
+        "url": "https://antigravity.com"
+    }
+}

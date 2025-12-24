@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "com.antigravity.toolkit": "file:../LocalPackages/com.antigravity.toolkit",
     "com.unity.ide.visualstudio": "2.0.22",
+    "com.unity.inputsystem": "1.17.0",
     "com.unity.multiplayer.center": "1.0.1",
     "com.unity.sdk.linux-x86_64": "1.0.2",
     "com.unity.toolchain.linux-x86_64-linux": "1.0.2",
