@@ -1,0 +1,56 @@
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Mm]emoryCaptures/
+
+# Asset meta files matching common patterns
+# Standard Unity meta files MUST be tracked
+# (Removed accidental ignore rules for .unity.meta and .cs.meta)
+
+# Project solution files
+*.sln
+*.csproj
+*.unityproj
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svclog
+*.pdb
+*.opendb
+*.IDB
+*.db-shm
+*.db-wal
+
+# Unity3D generated meta files
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Unity3D Generated File On Crash Reports
+sysinfo.txt
+
+# Builds
+*.apk
+*.unitypackage
+
+# Crashlytics generated file
+crashlytics-build.properties
+
+# Packed Assets
+/[Aa]ssets/[Aa]ddressableAssetsData/*/[Ll]ayout.bin
+/[Aa]ssets/[Aa]ddressableAssetsData/*/[Cc]atalog.json
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

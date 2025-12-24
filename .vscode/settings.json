@@ -1,0 +1,16 @@
+{
+    "dotnet.server.useOmnisharp": true,
+    "csharp.suppressDotnetRestoreNotification": true,
+    "csharp.format.enable": true,
+    "editor.formatOnSave": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/Library": true,
+        "**/Temp": true,
+        "**/Obj": true,
+        "**/*.csproj": false,
+        "**/*.sln": false
+    },
+    "dotnet.defaultSolution": "Antigravity Workflow.sln"
+}
