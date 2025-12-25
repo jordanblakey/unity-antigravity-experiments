@@ -1,10 +1,10 @@
-using UnityEngine;
-using UnityEditor;
-using System.IO;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Text;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using UnityEditor;
+using UnityEngine;
 
 namespace Antigravity.Editor
 {
@@ -26,11 +26,11 @@ namespace Antigravity.Editor
             public string RawBody;
             public string Timestamp;
             public LogType Type;
-            
+
             public bool IsExpanded;
             public float LastCachedHeight = -1;
             public float LastHeaderHeight = -1;
-            
+
             // Rich text displays
             public string DisplayHeader;
             public string DisplayBody;
@@ -99,7 +99,7 @@ namespace Antigravity.Editor
                     return _buffer[physicalIndex];
                 }
             }
-            
+
             public IEnumerable<T> Iterate()
             {
                 for (int i = 0; i < _count; i++) yield return this[i];
@@ -115,7 +115,7 @@ namespace Antigravity.Editor
         // --- State ---
         private CircularBuffer<LogEntry> _masterBuffer = new CircularBuffer<LogEntry>(MAX_ENTRIES);
         private List<LogEntry> _filteredEntries = new List<LogEntry>(MAX_ENTRIES);
-        
+
         private string _logPath;
         private long _lastFilePosition = 0;
         private string _leftoverText = "";
@@ -139,7 +139,7 @@ namespace Antigravity.Editor
             titleContent = new GUIContent("Editor Logs", EditorGUIUtility.IconContent("d_Profiler.GlobalIllumination@2x").image);
 
             ResetInternalState(true); // True = full reset including file position
-            
+
             string home = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             _logPath = Path.Combine(home, ".config/unity3d/Editor.log");
 
@@ -154,7 +154,7 @@ namespace Antigravity.Editor
             _leftoverText = "";
             _idCounter = 0;
             _focusedEntryId = -1;
-            
+
             // Clear styles to prevent stale "foldout" data across reloads
             _headerStyle = null;
             _labelStyle = null;
@@ -185,10 +185,10 @@ namespace Antigravity.Editor
                 using (var fs = new FileStream(_logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     long len = fs.Length;
-                    if (len < _lastFilePosition) 
+                    if (len < _lastFilePosition)
                     {
                         // File shrunk (log rotation?) -> Reset to start
-                        _lastFilePosition = 0; 
+                        _lastFilePosition = 0;
                     }
 
                     if (len > _lastFilePosition)
@@ -203,7 +203,7 @@ namespace Antigravity.Editor
                     }
                 }
             }
-            catch (Exception) 
+            catch (Exception)
             {
                 // Swallow async IO errors (file locks, disposal races)
                 // This prevents editor spam if Unity locks the log briefly
@@ -216,14 +216,14 @@ namespace Antigravity.Editor
         {
             _masterBuffer.Clear();
             if (!File.Exists(_logPath)) return;
-            
+
             try
             {
                 using (var fs = new FileStream(_logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     long len = fs.Length;
                     long startPos = Math.Max(0, len - 512000); // 512KB tail
-                    
+
                     fs.Seek(startPos, SeekOrigin.Begin);
                     using (var reader = new StreamReader(fs))
                     {
@@ -253,10 +253,10 @@ namespace Antigravity.Editor
                 {
                     var entry = CreateEntry(line);
                     _masterBuffer.Add(entry);
-                    
+
                     // Add to filter if matches
                     if (PassesFilter(entry)) _filteredEntries.Add(entry);
-                    
+
                     // Maintain SYNC: If filtered list exceeds max, prune from top
                     // Note: CircularBuffer auto-prunes master. Filtered list needs manual cap.
                     if (_filteredEntries.Count > MAX_ENTRIES) _filteredEntries.RemoveAt(0);
@@ -277,6 +277,29 @@ namespace Antigravity.Editor
 
         private bool IsHeader(string line)
         {
+            // Stack Trace / Footer detection
+            // Note: Stack traces in Editor.log often come as unindented lines following the message.
+            // We must detect these to prevent them from becoming their own entries.
+
+            // 1. Footer: (Filename: ... Line: ...)
+            if (line.StartsWith("(Filename:")) return false;
+
+            // 2. Stack frame source location: (at ...)
+            if (line.Contains("(at ")) return false;
+
+            // 3. Common stack frame signatures (Namespace.Class:Method)
+            // Heuristic needs to be careful not to kill valid logs.
+            // Unity stack traces typically look like: "Namespace.Class:Method (Args)"
+            if (line.Contains(":") && line.Contains("(") && line.IndexOf(':') < line.IndexOf('('))
+            {
+                // This covers "UnityEngine.Debug:Log (object)" and similar
+                // But could also match "MyLog: Something happened (context)"
+                // To be safer, we can check for known prefixes or lack of spaces before colon
+                int colon = line.IndexOf(':');
+                // If there is no space before the colon, it's likely a method signature
+                if (colon > 0 && line[colon - 1] != ' ') return false;
+            }
+
             string trimmed = line.TrimStart();
             if (_timestampRegex.IsMatch(trimmed)) return true;
             if (trimmed.Contains("Antigravity:") || trimmed.StartsWith("Error") || trimmed.StartsWith("Warning")) return true;
@@ -299,7 +322,8 @@ namespace Antigravity.Editor
             if (header.StartsWith("Error")) type = LogType.Error;
             else if (header.StartsWith("Warning")) type = LogType.Warning;
 
-            var entry = new LogEntry {
+            var entry = new LogEntry
+            {
                 Id = _idCounter++,
                 Timestamp = timestamp,
                 RawHeader = header,
@@ -355,12 +379,12 @@ namespace Antigravity.Editor
                 for (int i = 0; i < _filteredEntries.Count; i++)
                 {
                     var entry = _filteredEntries[i];
-                    
+
                     if (entry.LastCachedHeight < 0) CalculateEntryHeight(entry, contentWidth);
 
                     float h = entry.LastCachedHeight;
                     bool isVisible = (currentY + h > viewTop && currentY < viewBottom);
-                    
+
                     if (isVisible || entry.Id == _focusedEntryId)
                     {
                         DrawEntry(entry, currentY, contentWidth);
@@ -371,7 +395,7 @@ namespace Antigravity.Editor
                 }
 
                 if (_autoScroll && Event.current.type == EventType.Layout) _scrollPos.y = 1000000;
-                
+
                 // Smart Resume
                 if (!_autoScroll && Event.current.type == EventType.Repaint)
                 {
@@ -416,7 +440,7 @@ namespace Antigravity.Editor
 
                     GUI.SetNextControlName("log_header_" + entry.Id);
                     EditorGUI.SelectableLabel(new Rect(20, 1, width - 20, entry.LastHeaderHeight), entry.DisplayHeader, _headerStyle);
-                    
+
                     if (entry.IsExpanded)
                     {
                         float bodyY = entry.LastHeaderHeight + 2;
@@ -440,10 +464,10 @@ namespace Antigravity.Editor
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
             {
                 // Clear List, but DON'T reset file pos to 0 (keeps old logs hidden)
-                if (GUILayout.Button("Clear Logs", EditorStyles.toolbarButton, GUILayout.Width(65))) 
-                { 
-                    ResetInternalState(false); 
-                    Repaint(); 
+                if (GUILayout.Button("Clear Logs", EditorStyles.toolbarButton, GUILayout.Width(65)))
+                {
+                    ResetInternalState(false);
+                    Repaint();
                 }
 
                 EditorGUI.BeginChangeCheck();
@@ -485,17 +509,23 @@ namespace Antigravity.Editor
         {
             if (_headerStyle == null)
             {
-                _headerStyle = new GUIStyle(EditorStyles.label) { richText = true, padding = new RectOffset(0, 0, 0, 0) };
+                var font = AssetDatabase.LoadAssetAtPath<Font>("Packages/com.antigravity.toolkit/Fonts/AnkaCoder-C87-r.ttf");
+
+                _headerStyle = new GUIStyle(EditorStyles.label) { richText = true, padding = new RectOffset(0, 0, 0, 0), font = font };
                 _headerStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f);
             }
             if (_labelStyle == null)
             {
-                _labelStyle = new GUIStyle(EditorStyles.label) { richText = true, padding = new RectOffset(0, 0, 0, 0) };
+                var font = AssetDatabase.LoadAssetAtPath<Font>("Packages/com.antigravity.toolkit/Fonts/AnkaCoder-C87-r.ttf");
+
+                _labelStyle = new GUIStyle(EditorStyles.label) { richText = true, padding = new RectOffset(0, 0, 0, 0), font = font };
                 _labelStyle.normal.textColor = new Color(0.9f, 0.9f, 0.9f);
             }
             if (_bodyStyle == null)
             {
-                _bodyStyle = new GUIStyle(EditorStyles.label) { wordWrap = true, richText = true };
+                var font = AssetDatabase.LoadAssetAtPath<Font>("Packages/com.antigravity.toolkit/Fonts/AnkaCoder-C87-r.ttf");
+
+                _bodyStyle = new GUIStyle(EditorStyles.label) { wordWrap = true, richText = true, font = font };
                 _bodyStyle.normal.textColor = new Color(0.7f, 0.7f, 0.7f);
             }
         }
