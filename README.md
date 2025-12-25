@@ -2,6 +2,17 @@
 
 This project is a Unity workflow experiment featuring the **Antigravity Toolkit**—a set of editor utilities designed to improve the development experience, particularly on Linux.
 
+## Development Notes
+
+```txt
+  # Solve xwayland window compositing issues by setting vulkan as the default graphics api for Linux.
+  - Project Settings > Player > Other Settings > Graphics > Graphics APIs:
+  - uncheck auto graphics api for Linux
+  - set vulkan to be the default for Linux
+
+  # For good measure pass -force-vulkan to unity editor in unity hub "add command line arguments"
+```
+
 ## Setup
 
 To ensure C# IntelliSense works correctly within the Antigravity editor environment, run the provided setup script:

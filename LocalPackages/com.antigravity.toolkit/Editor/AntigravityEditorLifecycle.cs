@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Antigravity.Editor
 {
     [InitializeOnLoad]
-    public static class EditorLifecycle
+    public static class AntigravityEditorLifecycle
     {
         // Toggle this to see logs in the console
         public static bool EnableDebugLogs => AntigravitySettings.ShowDebugLogs;
@@ -14,7 +14,7 @@ namespace Antigravity.Editor
         // Auto-save feature
         public static bool AutoSaveOnFocusLoss = true;
 
-        static EditorLifecycle()
+        static AntigravityEditorLifecycle()
         {
             // Subscribe to all relevant events
             EditorApplication.contextualPropertyMenu += OnContextualPropertyMenu;
@@ -39,6 +39,12 @@ namespace Antigravity.Editor
             {
                 Debug.Log("[EditorLifecycle] Initialized and listening to events.");
             }
+        }
+
+        private static void OnUpdate()
+        {
+            // Update runs very frequently, so we typically don't log it unless debugging specifically for it
+            // if (EnableDebugLogs) Debug.Log("[EditorLifecycle] Update");
         }
 
         private static void OnContextualPropertyMenu(GenericMenu menu, SerializedProperty property)
@@ -105,12 +111,6 @@ namespace Antigravity.Editor
         private static void OnSearchChanged()
         {
             if (EnableDebugLogs) Debug.Log("[EditorLifecycle] SearchChanged");
-        }
-
-        private static void OnUpdate()
-        {
-            // Update runs very frequently, so we typically don't log it unless debugging specifically for it
-            // if (EnableDebugLogs) Debug.Log("[EditorLifecycle] Update");
         }
 
         private static void OnUpdateMainWindowTitle(ApplicationTitleDescriptor titleDescriptor)

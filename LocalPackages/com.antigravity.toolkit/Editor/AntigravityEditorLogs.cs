@@ -14,7 +14,7 @@ namespace Antigravity.Editor
     /// </summary>
     public class AntigravityConsole : EditorWindow
     {
-        [MenuItem("Antigravity/Editor Logs %l", false, 10)]
+        [MenuItem("Antigravity/Editor Logs %#i", false, 10)]
         public static void Open() => GetWindow<AntigravityConsole>("Editor Logs");
 
         // --- Data Models ---
