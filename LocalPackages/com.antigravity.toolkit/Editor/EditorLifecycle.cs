@@ -17,21 +17,23 @@ namespace Antigravity.Editor
         static EditorLifecycle()
         {
             // Subscribe to all relevant events
-            EditorApplication.update += OnUpdate;
+            EditorApplication.contextualPropertyMenu += OnContextualPropertyMenu;
             EditorApplication.delayCall += OnDelayCall;
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-            EditorApplication.pauseStateChanged += OnPauseStateChanged;
-            EditorApplication.quitting += OnQuitting;
-            EditorApplication.wantsToQuit += OnWantsToQuit;
-            EditorApplication.projectChanged += OnProjectChanged;
+            EditorApplication.focusChanged += OnFocusChanged;
             EditorApplication.hierarchyChanged += OnHierarchyChanged;
             EditorApplication.modifierKeysChanged += OnModifierKeysChanged;
+            EditorApplication.pauseStateChanged += OnPauseStateChanged;
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            EditorApplication.projectChanged += OnProjectChanged;
+            EditorApplication.quitting += OnQuitting;
+            EditorApplication.searchChanged += OnSearchChanged;
+            EditorApplication.update += OnUpdate;
+            EditorApplication.updateMainWindowTitle += OnUpdateMainWindowTitle;
+            EditorApplication.wantsToQuit += OnWantsToQuit;
 
-            // Focus changed event (available in newer Unity versions, generally 2018+)
-            EditorApplication.focusChanged += OnFocusChanged;
-
-            // Contextual menu callback
-            EditorApplication.contextualPropertyMenu += OnContextualPropertyMenu;
+            // LOUD
+            // EditorApplication.projectWindowItemInstanceOnGUI += OnProjectWindowItemInstanceOnGUI;
+            // EditorApplication.projectWindowItemOnGUI += OnProjectWindowItemOnGUI;
 
             if (EnableDebugLogs)
             {
@@ -39,10 +41,9 @@ namespace Antigravity.Editor
             }
         }
 
-        private static void OnUpdate()
+        private static void OnContextualPropertyMenu(GenericMenu menu, SerializedProperty property)
         {
-            // Update runs very frequently, so we typically don't log it unless debugging specifically for it
-            // if (EnableDebugLogs) Debug.Log("[EditorLifecycle] Update");
+            if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] ContextualPropertyMenu for property: {property.propertyPath}");
         }
 
         private static void OnDelayCall()
@@ -50,30 +51,23 @@ namespace Antigravity.Editor
             if (EnableDebugLogs) Debug.Log("[EditorLifecycle] DelayCall executed");
         }
 
-        private static void OnPlayModeStateChanged(PlayModeStateChange state)
+        private static void OnFocusChanged(bool focused)
         {
-            if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] PlayModeStateChanged: {state}");
-        }
+            if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] FocusChanged: {focused}");
+            if (!focused && AutoSaveOnFocusLoss)
+            {
+                int sceneCount = UnityEngine.SceneManagement.SceneManager.sceneCount;
 
-        private static void OnPauseStateChanged(PauseState state)
-        {
-            if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] PauseStateChanged: {state}");
-        }
-
-        private static void OnQuitting()
-        {
-            if (EnableDebugLogs) Debug.Log("[EditorLifecycle] Quitting");
-        }
-
-        private static bool OnWantsToQuit()
-        {
-            if (EnableDebugLogs) Debug.Log("[EditorLifecycle] WantsToQuit");
-            return true; // Return true to allow quitting
-        }
-
-        private static void OnProjectChanged()
-        {
-            if (EnableDebugLogs) Debug.Log("[EditorLifecycle] ProjectChanged");
+                for (int i = 0; i < sceneCount; i++)
+                {
+                    UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+                    if (scene.isDirty)
+                    {
+                        Debug.Log($"Scene [{i}]: {scene.name} - Quick Saving...");
+                        EditorSceneManager.SaveScene(scene);
+                    }
+                }
+            }
         }
 
         private static void OnHierarchyChanged()
@@ -83,27 +77,61 @@ namespace Antigravity.Editor
 
         private static void OnModifierKeysChanged()
         {
-            if (EnableDebugLogs) Debug.Log("[EditorLifecycle] ModifierKeysChanged");
+            // if (EnableDebugLogs) Debug.Log("[EditorLifecycle] ModifierKeysChanged");
         }
 
-        private static void OnFocusChanged(bool focused)
+        private static void OnPauseStateChanged(PauseState state)
         {
-            if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] FocusChanged: {focused}");
-
-            if (!focused && AutoSaveOnFocusLoss)
-            {
-                if (EditorSceneManager.SaveOpenScenes())
-                {
-                    // Debug.Log("[EditorLifecycle] Auto-saved scenes on focus loss.");
-                }
-                AssetDatabase.SaveAssets();
-                if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] Auto-saved scenes and assets (Focus Lost)");
-            }
+            if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] PauseStateChanged: {state}");
         }
 
-        private static void OnContextualPropertyMenu(GenericMenu menu, SerializedProperty property)
+        private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
-            if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] ContextualPropertyMenu for property: {property.propertyPath}");
+            if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] PlayModeStateChanged: {state}");
         }
+
+        private static void OnProjectChanged()
+        {
+            if (EnableDebugLogs) Debug.Log("[EditorLifecycle] ProjectChanged");
+        }
+
+        private static void OnQuitting()
+        {
+            if (EnableDebugLogs) Debug.Log("[EditorLifecycle] Quitting");
+        }
+
+        private static void OnSearchChanged()
+        {
+            if (EnableDebugLogs) Debug.Log("[EditorLifecycle] SearchChanged");
+        }
+
+        private static void OnUpdate()
+        {
+            // Update runs very frequently, so we typically don't log it unless debugging specifically for it
+            // if (EnableDebugLogs) Debug.Log("[EditorLifecycle] Update");
+        }
+
+        private static void OnUpdateMainWindowTitle(ApplicationTitleDescriptor titleDescriptor)
+        {
+            if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] UpdateMainWindowTitle: {titleDescriptor}");
+        }
+
+        private static bool OnWantsToQuit()
+        {
+            if (EnableDebugLogs) Debug.Log("[EditorLifecycle] WantsToQuit");
+            return true; // Return true to allow quitting
+        }
+
+        // LOUD
+        // private static void OnProjectWindowItemInstanceOnGUI(int instanceID, Rect selectionRect)
+        // {
+        //     if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] ProjectWindowItemInstanceOnGUI for instanceID: {instanceID}, Rect: {selectionRect}");
+        // }
+
+        // private static void OnProjectWindowItemOnGUI(string guid, Rect selectionRect)
+        // {
+        //     if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] ProjectWindowItemOnGUI for guid: {guid}, Rect: {selectionRect}");
+        // }
+
     }
 }
