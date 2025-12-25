@@ -56,14 +56,16 @@ namespace Antigravity.Editor
             if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] FocusChanged: {focused}");
             if (!focused && AutoSaveOnFocusLoss)
             {
+                // Save assets
+                AssetDatabase.SaveAssets();
+                // Save scenes
                 int sceneCount = UnityEngine.SceneManagement.SceneManager.sceneCount;
-
                 for (int i = 0; i < sceneCount; i++)
                 {
                     UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
                     if (scene.isDirty)
                     {
-                        Debug.Log($"Scene [{i}]: {scene.name} - Quick Saving...");
+                        if (EnableDebugLogs) Debug.Log($"[EditorLifecycle] Auto-saving scene: {scene.name}");
                         EditorSceneManager.SaveScene(scene);
                     }
                 }

@@ -321,6 +321,7 @@ GameObject:
   - component: {fileID: 1653256625}
   - component: {fileID: 1653256624}
   - component: {fileID: 1653256623}
+  - component: {fileID: 1653256628}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -428,12 +429,26 @@ Transform:
   m_GameObject: {fileID: 1653256622}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.11, y: 0.549, z: -2.626}
+  m_LocalPosition: {x: -2.21, y: 0.549, z: 1.991}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1653256628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653256622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bddec484c7afec27caeb3307e7103d87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectBobUpDown
+  bobSpeed: 2
+  bobHeight: 0.5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

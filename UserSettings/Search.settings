@@ -2,20 +2,20 @@ trackSelection = true
 refreshSearchWindowsInPlayMode = false
 pickerAdvancedUI = false
 fetchPreview = true
-defaultFlags = 0
+defaultFlags = 264
 keepOpen = true
 queryFolder = "Assets"
 onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = true
 scopes = {
-	"last_search.66F56946" = ""
+	"last_search.66F56946" = "play mode"
 	"OpenInspectorPreview.66F56946" = "0"
-	"currentGroup.66F56946" = "asset"
+	"currentGroup.66F56946" = "all"
 }
 providers = {
 	asset = {
-		active = true
+		active = false
 		priority = 25
 		defaultAction = null
 	}
@@ -35,7 +35,7 @@ providers = {
 		defaultAction = null
 	}
 	find = {
-		active = true
+		active = false
 		priority = 25
 		defaultAction = null
 	}
@@ -84,10 +84,26 @@ providers = {
 		priority = 85
 		defaultAction = null
 	}
+	"unity.ai.pattern.search" = {
+		active = false
+		priority = 80
+		defaultAction = null
+	}
+	"unity.ai.file.search" = {
+		active = false
+		priority = 85
+		defaultAction = null
+	}
 }
 objectSelectors = {
 }
 recentSearches = [
+	"services"
+	"me"
+	"togle p"
+	"play toggle"
+	"play modes"
+	"game mod"
 	""
 	"count{...t=[AnimationClip, AudioClip,Script,Material,model,prefab,sceneasset,scriptableobject,texture2d] -is:nested}"
 	"distinct{select{a:assets, @type}}"
