@@ -1,6 +1,8 @@
 {
     "dotnet.server.useOmnisharp": true,
-    "csharp.suppressDotnetRestoreNotification": true,
+    "dotnet.formatting.organizeImportsOnFormat": true,
+    "omnisharp.useModernNet": true,
+    // "csharp.suppressDotnetRestoreNotification": true,
     "csharp.format.enable": true,
     "editor.formatOnSave": true,
     "files.exclude": {
@@ -12,5 +14,5 @@
         "**/*.csproj": false,
         "**/*.sln": false
     },
-    "dotnet.defaultSolution": "Antigravity Workflow.sln"
+    "dotnet.defaultSolution": "Antigravity Workflow.sln",
 }
